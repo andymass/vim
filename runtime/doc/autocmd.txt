@@ -279,6 +279,9 @@ Name			triggered by ~
 |FileChangedShellPost|	After handling a file changed since editing started
 |FileChangedRO|		before making the first change to a read-only file
 
+|DirChanged|		The working directory for all buffers has changed.
+|DirChangedLocal|	The working directory for this buffer has changed.
+
 |ShellCmdPost|		after executing a shell command
 |ShellFilterPost|	after filtering with a shell command
 
@@ -593,6 +596,14 @@ FileChangedRO			Before making the first change to a read-only
 							*E881*
 				If the number of lines changes saving for undo
 				may fail and the change will be aborted.
+							*DirChanged*
+DirChanged			The working directory for all buffers has been
+				changed in response to the :cd command or one
+				of its synonyms.
+							*DirChangedLocal*
+DirChangedLocal			The working directory for this buffer has been
+				changed in response to the :lcd command or one
+				of its synonyms.
 							*FileChangedShell*
 FileChangedShell		When Vim notices that the modification time of
 				a file has changed since editing started.

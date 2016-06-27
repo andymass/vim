@@ -1289,6 +1289,8 @@ enum auto_event
     EVENT_CMDWINLEAVE,		/* before leaving the cmdline window */
     EVENT_COLORSCHEME,		/* after loading a colorscheme */
     EVENT_COMPLETEDONE,		/* after finishing insert complete */
+    EVENT_DIRCHANGED,		/* after changing directory using :cd or a synonym */
+    EVENT_DIRCHANGEDLOCAL,	/* after changing directory using :lcd or a synonym */
     EVENT_FILEAPPENDPOST,	/* after appending to a file */
     EVENT_FILEAPPENDPRE,	/* before appending to a file */
     EVENT_FILEAPPENDCMD,	/* append to a file using command */

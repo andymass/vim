@@ -8993,6 +8993,12 @@ ex_cd(exarg_T *eap)
 	    /* Echo the new current directory if the command was typed. */
 	    if (KeyTyped || p_verbose >= 5)
 		ex_pwd(eap);
+
+#ifdef FEAT_AUTOCMD
+		event_T event = eap->cmdidx == CMD_lcd || eap->cmdidx == CMD_lchdir ?
+									EVENT_DIRCHANGEDLOCAL : EVENT_DIRCHANGED;
+		apply_autocmds(event, new_dir, new_dir, FALSE, curbuf);
+#endif
 	}
 	vim_free(tofree);
     }
