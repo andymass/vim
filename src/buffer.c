@@ -1771,8 +1771,17 @@ do_autochdir(void)
 {
     if ((starting == 0 || test_autochdir)
 	    && curbuf->b_ffname != NULL
-	    && vim_chdirfile(curbuf->b_ffname) == OK)
+	    && vim_chdirfile(curbuf->b_ffname) == OK) {
+	char_u dir[MAXPATHL];
+
 	shorten_fnames(TRUE);
+
+#ifdef FEAT_AUTOCMD
+	vim_strncpy(dir, curbuf->b_ffname, MAXPATHL - 1);
+	*gettail_sep(dir) = NUL;
+	apply_autocmds(EVENT_DIRCHANGED, dir, dir, FALSE, curbuf);
+#endif
+    }
 }
 #endif
 
