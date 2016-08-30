@@ -169,7 +169,7 @@ func Test_augroup_warning()
   call assert_true(match(execute('au VimEnter'), "-Deleted-.*VimEnter") >= 0)
 endfunc
 
-function Before_test_dirchanged()
+function s:Before_test_dirchanged()
   augroup test_dirchanged
     autocmd!
   augroup END
@@ -178,28 +178,28 @@ function Before_test_dirchanged()
   let s:dir_other=s:dir_this . '/foo'
 endfunc
 
-function After_test_dirchanged()
+function s:After_test_dirchanged()
   exe 'cd' s:dir_this
 endfunc
 
 function Test_dirchanged_global()
-  call Before_test_dirchanged()
+  call s:Before_test_dirchanged()
   autocmd test_dirchanged DirChanged global call add(s:li, "cd:")
   autocmd test_dirchanged DirChanged global call add(s:li, expand("<afile>"))
   exe 'cd' s:dir_other
   call assert_equal(["cd:", s:dir_other], s:li)
   exe 'lcd' s:dir_other
   call assert_equal(["cd:", s:dir_other], s:li)
-  call After_test_dirchanged()
+  call s:After_test_dirchanged()
 endfunc
 
 function Test_dirchanged_local()
-  call Before_test_dirchanged()
+  call s:Before_test_dirchanged()
   autocmd test_dirchanged DirChanged window call add(s:li, "lcd:")
   autocmd test_dirchanged DirChanged window call add(s:li, expand("<afile>"))
   exe 'cd' s:dir_other
   call assert_equal([], s:li)
   exe 'lcd' s:dir_other
   call assert_equal(["lcd:", s:dir_other], s:li)
-  call After_test_dirchanged()
+  call s:After_test_dirchanged()
 endfunc
