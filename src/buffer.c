@@ -1781,7 +1781,7 @@ do_autochdir(void)
 #ifdef FEAT_AUTOCMD
 	vim_strncpy(dir, curbuf->b_ffname, MAXPATHL - 1);
 	*gettail_sep(dir) = NUL;
-	apply_autocmds(EVENT_DIRCHANGED, dir, dir, FALSE, curbuf);
+	apply_autocmds(EVENT_DIRCHANGED, "window", dir, FALSE, curbuf);
 #endif
     }
 }
