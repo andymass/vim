@@ -8995,7 +8995,10 @@ ex_cd(exarg_T *eap)
 		ex_pwd(eap);
 
 #ifdef FEAT_AUTOCMD
-	    apply_autocmds(EVENT_DIRCHANGED, new_dir, new_dir, FALSE, curbuf);
+            char_u *chdir_scope = eap->cmdidx == CMD_lcd || eap->cmdidx == CMD_lchdir ?
+                                                                        "window" : "global";
+
+	    apply_autocmds(EVENT_DIRCHANGED, chdir_scope, new_dir, FALSE, curbuf);
 #endif
 	}
 	vim_free(tofree);
