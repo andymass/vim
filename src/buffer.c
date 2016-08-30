@@ -1772,7 +1772,9 @@ do_autochdir(void)
     if ((starting == 0 || test_autochdir)
 	    && curbuf->b_ffname != NULL
 	    && vim_chdirfile(curbuf->b_ffname) == OK) {
+#ifdef FEAT_AUTOCMD
 	char_u dir[MAXPATHL];
+#endif
 
 	shorten_fnames(TRUE);
 
