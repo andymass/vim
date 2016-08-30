@@ -8587,6 +8587,13 @@ do_autocmd_event(
 	    patlen = (int)STRLEN(buflocal_pat);	/*   but not endpat */
 	}
 
+        if (event == EVENT_DIRCHANGED &&
+            STRNCMP(pat, "global", patlen && STRNCMP(pat, "window", patlen)))
+        {
+            EMSG(_("Pattern for DirChanged must be \"global\" or \"window\""));
+            return FAIL;
+        }
+
 	/*
 	 * Find AutoPat entries with this pattern.
 	 */
