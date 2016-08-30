@@ -279,8 +279,7 @@ Name			triggered by ~
 |FileChangedShellPost|	After handling a file changed since editing started
 |FileChangedRO|		before making the first change to a read-only file
 
-|DirChanged|		The working directory has changed in response to a
-			user action.
+|DirChanged|		after the working directory has changed
 
 |ShellCmdPost|		after executing a shell command
 |ShellFilterPost|	after filtering with a shell command
@@ -597,10 +596,9 @@ FileChangedRO			Before making the first change to a read-only
 				If the number of lines changes saving for undo
 				may fail and the change will be aborted.
 							*DirChanged*
-DirChanged			The working directory has been changed in
-				response to the |:cd| or |:lcd| family of
-				commands, or as a result of the 'autochdir'
-				option.
+DirChanged			The working directory has changed in response
+				to the |:cd| or |:lcd| family of commands, or
+				as a result of the 'autochdir' option.
 							*FileChangedShell*
 FileChangedShell		When Vim notices that the modification time of
 				a file has changed since editing started.
