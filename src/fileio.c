@@ -8588,7 +8588,7 @@ do_autocmd_event(
 	}
 
         if (event == EVENT_DIRCHANGED &&
-            STRNCMP(pat, "global", patlen && STRNCMP(pat, "window", patlen)))
+            STRNCMP(pat, "global", patlen) && STRNCMP(pat, "window", patlen))
         {
             EMSG(_("Pattern for DirChanged must be \"global\" or \"window\""));
             return FAIL;
