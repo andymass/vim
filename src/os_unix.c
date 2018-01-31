@@ -3469,7 +3469,7 @@ mch_settmode(int tmode)
 	/*
 	 * ~ICRNL enables typing ^V^M
 	 */
-	tnew.c_iflag &= ~ICRNL;
+	tnew.c_iflag &= ~(ICRNL | IXON);
 	tnew.c_lflag &= ~(ICANON | ECHO | ISIG | ECHOE
 # if defined(IEXTEN) && !defined(__MINT__)
 		    | IEXTEN	    /* IEXTEN enables typing ^V on SOLARIS */

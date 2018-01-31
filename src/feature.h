@@ -855,7 +855,7 @@
 /*
  * VIMRC_FILE		Name of the .vimrc file in current dir.
  */
-/* #define VIMRC_FILE	".vimrc" */
+#define VIMRC_FILE	".vimrc"
 
 /*
  * EXRC_FILE		Name of the .exrc file in current dir.
@@ -909,12 +909,12 @@
 /*
  * SYS_VIMRC_FILE	Name of the system-wide .vimrc file.
  */
-/* #define SYS_VIMRC_FILE	"/etc/vimrc" */
+#define SYS_VIMRC_FILE	"/etc/vimrc"
 
 /*
  * SYS_GVIMRC_FILE	Name of the system-wide .gvimrc file.
  */
-/* #define SYS_GVIMRC_FILE	"/etc/gvimrc" */
+#define SYS_GVIMRC_FILE	"/etc/gvimrc"
 
 /*
  * DFLT_HELPFILE	Name of the help file.
