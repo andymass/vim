@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 
 ./configure \
+      CFLAGS='-O3 -march=native' \
       --prefix=/usr \
       --localstatedir=/var/lib/vim \
       --with-features=huge \
