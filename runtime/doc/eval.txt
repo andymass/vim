@@ -2490,6 +2490,7 @@ win_screenpos({nr})		List	get screen position of window {nr}
 winbufnr({nr})			Number	buffer number of window {nr}
 wincol()			Number	window column of the cursor
 winheight({nr})			Number	height of window {nr}
+winlayout([{tabnr}])		List	layout of windows in tab {tabnr}
 winline()			Number	window line of the cursor
 winnr([{expr}])			Number	number of current window
 winrestcmd()			String	returns command to restore window sizes
@@ -4943,8 +4944,6 @@ getwininfo([{winid}])					*getwininfo()*
 		Each List item is a Dictionary with the following entries:
 			bufnr		number of buffer in the window
 			height		window height (excluding winbar)
-			winbar		1 if the window has a toolbar, 0
-					otherwise
 			loclist		1 if showing a location list
 					{only with the +quickfix feature}
 			quickfix	1 if quickfix or location list window
@@ -4955,6 +4954,8 @@ getwininfo([{winid}])					*getwininfo()*
 			variables	a reference to the dictionary with
 					window-local variables
 			width		window width
+			winbar		1 if the window has a toolbar, 0
+					otherwise
 			winid		|window-ID|
 			winnr		window number
 
@@ -8970,6 +8971,28 @@ winheight({nr})						*winheight()*
 		This excludes any window toolbar line.
 		Examples: >
   :echo "The current window has " . winheight(0) . " lines."
+<
+winlayout([{tabnr}])					*winlayout()*
+		The result is a List containing the layout of windows in a
+		tabpage. If there is only one window in the tabpage, returns a
+		list with a window identifier. If there is more than one
+		window in the tabpage, returns a list where the first item is
+		either "row" (for vertically split windows) or "col" (for
+		horizontally split windows) followed by a list of window
+		identifiers or a nested list.  Without {tabnr} use the current
+		tabpage, otherwise the tabpage with number {tabnr}. If the
+		tabpage {tabnr} is not found, returns an empty list.
+		Example: >
+			" Only one window in the tab page
+			:echo winlayout()
+			[1000]
+			" Two horizontally split windows
+			:echo winlayout()
+			['col', [1000, 1001]]
+			" Three horizontally split windows, with two
+			" vertically split windows in the middle window
+			:echo winlayout(2)
+			['col', [1002, ['row', [1003, 1001]], 1000]]
 <
 							*winline()*
 winline()	The result is a Number, which is the screen line of the cursor
