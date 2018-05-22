@@ -20,17 +20,20 @@
  *   1..9 = registers '1' to '9', for deletes
  * 10..35 = registers 'a' to 'z'
  *     36 = delete register '-'
- *     37 = Selection register '*'. Only if FEAT_CLIPBOARD defined
- *     38 = Clipboard register '+'. Only if FEAT_CLIPBOARD and FEAT_X11 defined
+ *     37 = redo buffer register
+ *     38 = Selection register '*'. Only if FEAT_CLIPBOARD defined
+ *     39 = Clipboard register '+'. Only if FEAT_CLIPBOARD and FEAT_X11 defined
+ *     40 = Drop register '~'. Only if FEAT_CLIPBOARD defined and FEAT_DND defined
  */
 /*
  * Symbolic names for some registers.
  */
 #define DELETION_REGISTER	36
+#define REDO_REGISTER		37
 #ifdef FEAT_CLIPBOARD
-# define STAR_REGISTER		37
+# define STAR_REGISTER		38
 #  ifdef FEAT_X11
-#   define PLUS_REGISTER	38
+#   define PLUS_REGISTER	39
 #  else
 #   define PLUS_REGISTER	STAR_REGISTER	    /* there is only one */
 #  endif
@@ -46,7 +49,7 @@
 #  define NUM_REGISTERS		(PLUS_REGISTER + 1)
 # endif
 #else
-# define NUM_REGISTERS		37
+# define NUM_REGISTERS		38
 #endif
 
 /*
@@ -871,9 +874,9 @@ valid_yank_reg(
     if (       (regname > 0 && ASCII_ISALNUM(regname))
 	    || (!writing && vim_strchr((char_u *)
 #ifdef FEAT_EVAL
-				    "/.%:="
+				    "/.%:;="
 #else
-				    "/.%:"
+				    "/.%:;"
 #endif
 					, regname) != NULL)
 	    || regname == '#'
@@ -1550,6 +1553,17 @@ get_spec_reg(
 	    *allocated = TRUE;
 	    if (*argp == NULL && errmsg)
 		EMSG(_(e_noinstext));
+	    return TRUE;
+
+	case ';':		/* redo buffer */
+	    *argp = get_inserted();
+	    /* {
+		char_u* get_old_inserted(void);
+		*argp = get_old_inserted();
+	    } */
+	    *allocated = TRUE;
+	    if (*argp == NULL && errmsg)
+		EMSG(_(e_noprev));
 	    return TRUE;
 
 #ifdef FEAT_SEARCHPATH
@@ -3518,6 +3532,11 @@ do_put(
 	return;
     }
 
+    /* XXX
+     */
+    if (regname == ';')
+	return;
+
     /*
      * For special registers '%' (file name), '#' (alternate file name) and
      * ':' (last command line), etc. we have to create a fake yank register.
@@ -4213,6 +4232,8 @@ get_register_name(int num)
 	return num + '0';
     else if (num == DELETION_REGISTER)
 	return '-';
+    else if (num == REDO_REGISTER)
+	return ';';
 #ifdef FEAT_CLIPBOARD
     else if (num == STAR_REGISTER)
 	return '*';
@@ -4339,6 +4360,17 @@ ex_display(exarg_T *eap)
     {
 	MSG_PUTS("\n\".   ");
 	dis_msg(p, TRUE);
+    }
+
+    /*
+     * display last used command (redo buffer)
+     */
+    if ((p = get_inserted()) != NULL
+		 && (arg == NULL || vim_strchr(arg, ';') != NULL) && !got_int)
+    {
+	MSG_PUTS("\n\";   ");
+	dis_msg(p, TRUE);
+	vim_free(p);
     }
 
     /*
