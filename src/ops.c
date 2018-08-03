@@ -4158,6 +4158,7 @@ ex_display(exarg_T *eap)
     int		attr;
     char_u	*arg = eap->arg;
     int		clen;
+    int		filtered;
 
     if (arg != NULL && *arg == NUL)
 	arg = NULL;
@@ -4201,7 +4202,10 @@ ex_display(exarg_T *eap)
 			     * pointer can be freed */
 #endif
 
-	if (yb->y_array != NULL)
+	filtered = 1;
+	for (j = 0; filtered && yb->y_array && j < yb->y_size; ++j)
+	    filtered = message_filtered(yb->y_array[j]);
+	if (yb->y_array != NULL && !filtered)
 	{
 	    msg_putchar('\n');
 	    msg_putchar('"');
@@ -4234,7 +4238,8 @@ ex_display(exarg_T *eap)
      * display last inserted text
      */
     if ((p = get_last_insert()) != NULL
-		 && (arg == NULL || vim_strchr(arg, '.') != NULL) && !got_int)
+		 && (arg == NULL || vim_strchr(arg, '.') != NULL) && !got_int
+		 && !message_filtered(p))
     {
 	msg_puts("\n\".   ");
 	dis_msg(p, TRUE);
@@ -4244,7 +4249,7 @@ ex_display(exarg_T *eap)
      * display last command line
      */
     if (last_cmdline != NULL && (arg == NULL || vim_strchr(arg, ':') != NULL)
-								  && !got_int)
+			      && !got_int && !message_filtered(last_cmdline))
     {
 	msg_puts("\n\":   ");
 	dis_msg(last_cmdline, FALSE);
@@ -4254,7 +4259,8 @@ ex_display(exarg_T *eap)
      * display current file name
      */
     if (curbuf->b_fname != NULL
-	    && (arg == NULL || vim_strchr(arg, '%') != NULL) && !got_int)
+	    && (arg == NULL || vim_strchr(arg, '%') != NULL) && !got_int
+	    && !message_filtered(curbuf->b_fname))
     {
 	msg_puts("\n\"%   ");
 	dis_msg(curbuf->b_fname, FALSE);
@@ -4268,7 +4274,8 @@ ex_display(exarg_T *eap)
 	char_u	    *fname;
 	linenr_T    dummy;
 
-	if (buflist_name_nr(0, &fname, &dummy) != FAIL)
+	if (buflist_name_nr(0, &fname, &dummy) != FAIL
+		&& !message_filtered(fname))
 	{
 	    msg_puts("\n\"#   ");
 	    dis_msg(fname, FALSE);
@@ -4279,7 +4286,8 @@ ex_display(exarg_T *eap)
      * display last search pattern
      */
     if (last_search_pat() != NULL
-		 && (arg == NULL || vim_strchr(arg, '/') != NULL) && !got_int)
+		 && (arg == NULL || vim_strchr(arg, '/') != NULL) && !got_int
+		 && !message_filtered(last_search_pat()))
     {
 	msg_puts("\n\"/   ");
 	dis_msg(last_search_pat(), FALSE);
@@ -4290,7 +4298,7 @@ ex_display(exarg_T *eap)
      * display last used expression
      */
     if (expr_line != NULL && (arg == NULL || vim_strchr(arg, '=') != NULL)
-								  && !got_int)
+			      && !got_int && !message_filtered(expr_line))
     {
 	msg_puts("\n\"=   ");
 	dis_msg(expr_line, FALSE);
