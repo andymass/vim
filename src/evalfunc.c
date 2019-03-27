@@ -587,7 +587,7 @@ static struct fst
     {"changenr",	0, 0, f_changenr},
     {"char2nr",		1, 2, f_char2nr},
     {"cindent",		1, 1, f_cindent},
-    {"clearmatches",	0, 0, f_clearmatches},
+    {"clearmatches",	0, 1, f_clearmatches},
     {"col",		1, 1, f_col},
 #if defined(FEAT_INS_EXPAND)
     {"complete",	2, 2, f_complete},
@@ -673,7 +673,7 @@ static struct fst
     {"getjumplist",	0, 2, f_getjumplist},
     {"getline",		1, 2, f_getline},
     {"getloclist",	1, 2, f_getloclist},
-    {"getmatches",	0, 0, f_getmatches},
+    {"getmatches",	0, 1, f_getmatches},
     {"getpid",		0, 0, f_getpid},
     {"getpos",		1, 1, f_getpos},
     {"getqflist",	0, 1, f_getqflist},
@@ -757,7 +757,7 @@ static struct fst
     {"matchadd",	2, 5, f_matchadd},
     {"matchaddpos",	2, 5, f_matchaddpos},
     {"matcharg",	1, 1, f_matcharg},
-    {"matchdelete",	1, 1, f_matchdelete},
+    {"matchdelete",	1, 2, f_matchdelete},
     {"matchend",	2, 4, f_matchend},
     {"matchlist",	2, 4, f_matchlist},
     {"matchstr",	2, 4, f_matchstr},
@@ -853,7 +853,7 @@ static struct fst
     {"setfperm",	2, 2, f_setfperm},
     {"setline",		2, 2, f_setline},
     {"setloclist",	2, 4, f_setloclist},
-    {"setmatches",	1, 1, f_setmatches},
+    {"setmatches",	1, 2, f_setmatches},
     {"setpos",		2, 2, f_setpos},
     {"setqflist",	1, 3, f_setqflist},
     {"setreg",		2, 3, f_setreg},
@@ -2497,7 +2497,17 @@ f_cindent(typval_T *argvars UNUSED, typval_T *rettv)
 f_clearmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 #ifdef FEAT_SEARCH_EXTRA
-    clear_matches(curwin);
+    win_T   *win = curwin;
+    if (argvars[0].v_type != VAR_UNKNOWN)
+    {
+	win = find_win_by_nr_or_id(&argvars[0]);
+	if (win == NULL)
+	{
+	    emsg(_("E957: Invalid window number"));
+	    return;
+	}
+    }
+    clear_matches(win);
 #endif
 }
 
@@ -5385,8 +5395,21 @@ f_getmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 #ifdef FEAT_SEARCH_EXTRA
     dict_T	*dict;
-    matchitem_T	*cur = curwin->w_match_head;
+    matchitem_T	*cur;
     int		i;
+    win_T	*win = curwin;
+
+    if (argvars[0].v_type != VAR_UNKNOWN)
+    {
+	win = find_win_by_nr_or_id(&argvars[0]);
+	if (win == NULL)
+	{
+	    emsg(_("E957: Invalid window number"));
+	    rettv_list_alloc(rettv);
+	    return;
+	}
+    }
+    cur = win->w_match_head;
 
     if (rettv_list_alloc(rettv) == OK)
     {
@@ -8366,7 +8389,18 @@ f_matcharg(typval_T *argvars UNUSED, typval_T *rettv)
 f_matchdelete(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 #ifdef FEAT_SEARCH_EXTRA
-    rettv->vval.v_number = match_delete(curwin,
+    win_T   *win = curwin;
+    if (argvars[1].v_type != VAR_UNKNOWN)
+    {
+	win = find_win_by_nr_or_id(&argvars[1]);
+	if (win == NULL)
+	{
+	    emsg(_("E957: Invalid window number"));
+	    rettv->vval.v_number = -1;
+	    return;
+	}
+    }
+    rettv->vval.v_number = match_delete(win,
 				       (int)tv_get_number(&argvars[0]), TRUE);
 #endif
 }
@@ -11110,6 +11144,7 @@ f_setmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     listitem_T	*li;
     dict_T	*d;
     list_T	*s = NULL;
+    win_T	*win = curwin;
 
     rettv->vval.v_number = -1;
     if (argvars[0].v_type != VAR_LIST)
@@ -11117,9 +11152,17 @@ f_setmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 	emsg(_(e_listreq));
 	return;
     }
+    if (argvars[1].v_type != VAR_UNKNOWN)
+    {
+	win = find_win_by_nr_or_id(&argvars[1]);
+	if (win == NULL)
+	{
+	    emsg(_("E957: Invalid window number"));
+	    return;
+	}
+    }
     if ((l = argvars[0].vval.v_list) != NULL)
     {
-
 	/* To some extent make sure that we are dealing with a list from
 	 * "getmatches()". */
 	li = l->lv_first;
@@ -11143,7 +11186,7 @@ f_setmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 	    li = li->li_next;
 	}
 
-	clear_matches(curwin);
+	clear_matches(win);
 	li = l->lv_first;
 	while (li != NULL)
 	{
@@ -11190,13 +11233,13 @@ f_setmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 			      : NULL;
 	    if (i == 0)
 	    {
-		match_add(curwin, group,
+		match_add(win, group,
 		    dict_get_string(d, (char_u *)"pattern", FALSE),
 		    priority, id, NULL, conceal);
 	    }
 	    else
 	    {
-		match_add(curwin, group, NULL, priority, id, s, conceal);
+		match_add(win, group, NULL, priority, id, s, conceal);
 		list_unref(s);
 		s = NULL;
 	    }

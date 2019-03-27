@@ -2262,7 +2262,7 @@ ch_status({handle} [, {options}])
 changenr()			Number	current change number
 char2nr({expr} [, {utf8}])	Number	ASCII/UTF8 value of first char in {expr}
 cindent({lnum})			Number	C indent for line {lnum}
-clearmatches()			none	clear all matches
+clearmatches([{win}])		none	clear all matches
 col({expr})			Number	column nr of cursor or mark
 complete({startcol}, {matches}) none	set Insert mode completion
 complete_add({expr})		Number	add completion match
@@ -2355,7 +2355,7 @@ getjumplist([{winnr} [, {tabnr}]])
 getline({lnum})			String	line {lnum} of current buffer
 getline({lnum}, {end})		List	lines {lnum} to {end} of current buffer
 getloclist({nr} [, {what}])	List	list of location list items
-getmatches()			List	list of current matches
+getmatches([{win}])		List	list of current matches
 getpid()			Number	process ID of Vim
 getpos({expr})			List	position of cursor, mark, etc.
 getqflist([{what}])		List	list of quickfix items
@@ -2446,7 +2446,7 @@ matchadd({group}, {pattern} [, {priority} [, {id} [, {dict}]]])
 matchaddpos({group}, {pos} [, {priority} [, {id} [, {dict}]]])
 				Number	highlight positions with {group}
 matcharg({nr})			List	arguments of |:match|
-matchdelete({id})		Number	delete match identified by {id}
+matchdelete({id} [, {win}])	Number	delete match identified by {id}
 matchend({expr}, {pat} [, {start} [, {count}]])
 				Number	position where {pat} ends in {expr}
 matchlist({expr}, {pat} [, {start} [, {count}]])
@@ -2550,7 +2550,7 @@ setfperm({fname}, {mode})	Number	set {fname} file permissions to {mode}
 setline({lnum}, {line})		Number	set line {lnum} to {line}
 setloclist({nr}, {list} [, {action} [, {what}]])
 				Number	modify location list using {list}
-setmatches({list})		Number	restore a list of matches
+setmatches({list} [, {win}])	Number	restore a list of matches
 setpos({expr}, {list})		Number	set the {expr} position to {list}
 setqflist({list} [, {action} [, {what}]])
 				Number	modify quickfix list using {list}
@@ -3451,9 +3451,11 @@ cindent({lnum})						*cindent()*
 		feature, -1 is returned.
 		See |C-indenting|.
 
-clearmatches()						*clearmatches()*
+clearmatches([{win}])					*clearmatches()*
 		Clears all matches previously defined by |matchadd()| and the
 		|:match| commands.
+		If {win} is specified, use the window with this number or
+		window ID instead of the current window.
 
 							*col()*
 col({expr})	The result is a Number, which is the byte index of the column
@@ -4977,7 +4979,7 @@ getloclist({nr} [, {what}])				*getloclist()*
 					|location-list-file-window| for more
 					details.
 
-getmatches()						*getmatches()*
+getmatches([{win}])					*getmatches()*
 		Returns a |List| with all matches previously defined by
 		|matchadd()| and the |:match| commands.  |getmatches()| is
 		useful in combination with |setmatches()|, as |setmatches()|
@@ -6442,11 +6444,13 @@ matcharg({nr})							*matcharg()*
 		Highlighting matches using the |:match| commands are limited
 		to three matches. |matchadd()| does not have this limitation.
 
-matchdelete({id})			       *matchdelete()* *E802* *E803*
+matchdelete({id} [, {win})		       *matchdelete()* *E802* *E803*
 		Deletes a match with ID {id} previously defined by |matchadd()|
 		or one of the |:match| commands.  Returns 0 if successful,
 		otherwise -1.  See example for |matchadd()|.  All matches can
 		be deleted in one operation by |clearmatches()|.
+		If {win} is specified, use the window with this number or
+		window ID instead of the current window.
 
 matchend({expr}, {pat} [, {start} [, {count}]])			*matchend()*
 		Same as |match()|, but return the index of first character
@@ -7838,10 +7842,12 @@ setloclist({nr}, {list} [, {action} [, {what}]])		*setloclist()*
 		only the items listed in {what} are set. Refer to |setqflist()|
 		for the list of supported keys in {what}.
 
-setmatches({list})					*setmatches()*
+setmatches({list} [, {win}])				*setmatches()*
 		Restores a list of matches saved by |getmatches()|.  Returns 0
 		if successful, otherwise -1.  All current matches are cleared
 		before the list is restored.  See example for |getmatches()|.
+		If {win} is specified, use the window with this number or
+		window ID instead of the current window .
 
 							*setpos()*
 setpos({expr}, {list})
